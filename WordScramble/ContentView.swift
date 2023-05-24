@@ -24,7 +24,7 @@ struct ContentView: View {
         NavigationView {
             List {
                 Section("Current Score") {
-                    Text("\(score)")
+                    Text("\(score) \(sentiment)")
                         .foregroundColor(scoreColor)
                 }
                 
@@ -44,11 +44,6 @@ struct ContentView: View {
                         .font(.title)
                     }
                 }.padding().padding(.vertical, 4.0)
-                
-                Section("How You're Doing") {
-                    Text(sentiment)
-                        .font(.system(size: 80))
-                }
             }
             .navigationTitle(rootWord)
             .onSubmit(addNewWord)
@@ -100,7 +95,8 @@ struct ContentView: View {
         withAnimation {
             usedWords.insert(answer, at: 0)
             score = score + answer.count
-            sentiment = sentimentAnalysis(score: score)
+            sentiment = sentimentAnalysis()
+            scoreColor = .green
         }
         newWord = ""
     }
@@ -109,6 +105,7 @@ struct ContentView: View {
         withAnimation {
             usedWords = []
             score = 0
+            scoreColor = .green
         }
         
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
@@ -162,16 +159,15 @@ struct ContentView: View {
         return randomInt
     }
     
-    func sentimentAnalysis(score: Int) -> String {
-        switch score {
-        case 0:
+    func sentimentAnalysis() -> String {
+        if score == 0 {
             return "😐"
-        case 1...3:
+        } else if score > 0 && score <= 3 {
             return "😀"
-        case let value where value < 0:
+        } else if score > 3 {
+            return "😊😱"
+        } else {
             return "🤮🤮🤮"
-        default:
-            return "😐"
         }
     }
 }
